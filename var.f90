@@ -25,5 +25,10 @@
             !variable used to shift all x-values so tms peak is on 0
             real(kind=8) :: shift  
 
+            !variables that hold spline coefficents
+            real(kind=8), dimension(10000) :: A, B, C, D
+
+            !variable that holds all root locations
+            real(kind=8), dimension(200) :: rt_loc
 
         end module

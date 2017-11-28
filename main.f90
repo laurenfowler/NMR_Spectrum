@@ -3,7 +3,7 @@
         use var !mod file containing all variables
         implicit none
             real (kind=8) :: tms
-            integer :: i
+            integer :: i, j
             
             !declare in file
             in_file = "nmr.in"
@@ -24,8 +24,8 @@
             !shifts x points over so tms is at 0 on x-axis
             !shifts y points over so baseline is new 0
             do i=1, num_pts
-                xpt(i) = xpt(i) + shift
-                ypt(i) = ypt(i) - inf%base
+                !xpt(i) = xpt(i) + shift
+                !ypt(i) = ypt(i) - inf%base
             end do
 
             !filters data with user designated filter
@@ -39,8 +39,40 @@
                 call SGFilter()
             end select
 
+            !creates coefficents for a spline function between every
+            !data point
+            !***SPLINE FUNCTION WORKS***!
+            call cubic_spline()
 
-        end program 
+        end program
+
+        subroutine find_root()
+        use var
+        real(kind=8), dimension(100000) :: spline_pts
+        real (kind=8) :: next_x, spline_x, y_val, x_val, s, f
+        integer :: genpts
+
+            genpts = 80000
+            i=1
+            j=1
+            s = (xpt(1) - xpt(num_pts))/genpts
+            next_x = xpt(j+1)
+            spline_x = xpt(j)
+
+            do while(i<genpts+1)
+                ! if step size has put x at another point, change the
+                ! spline function being called
+                if(spline_x .lt. next_x) then
+                    j = j + 1
+                    next_x = xpt(j+1)
+                end if
+                x_val = spline_x - xpt(j)
+                y_val=f(A(j), B(j), C(j), D(j), x_val)
+                i = i + 1
+                spline_x = spline_x - s
+            end do
+
+        end subroutine 
 
         !subroutine to read in nmr data and place in fortran struct
         subroutine nmr()
@@ -171,11 +203,48 @@
                     do k=1, inf%size
                         sum = sum + W(k) * ypt(index_arr(k))
                     end do
-                    print *, ypt(j), sum/norm_fact
                     ypt(j) = sum/norm_fact
-                    print *, ypt(j)
                 end do
             end do 
+
+        end subroutine
+
+        subroutine cubic_spline()
+        use var
+        real(kind=8), dimension(10000) :: alpha, iota, mu, zeta, h
+        integer :: i, j
+
+            do i=1, num_pts
+                A(i) = ypt(i)
+            end do
+
+            do i=1, num_pts-1
+                h(i) = xpt(i+1) - xpt(i)
+            end do
+
+            do i=2, num_pts-1
+                alpha(i)=(3.0*(A(i+1)-A(i)))/h(i)-(3.0*(A(i)-A(i-1)))/h(i-1)
+            end do
+
+            iota(1) = 1.0
+            mu(1) = 0.0
+            zeta(1) = 0.0
+
+            do i=2, num_pts-1
+                iota(i)=2.0*(xpt(i+1)-xpt(i-1))-h(i-1)*mu(i-1)
+                mu(i) = h(i)/iota(i)
+                zeta(i) = (alpha(i)-h(i-1)*zeta(i-1))/iota(i)
+            end do
+
+            iota(num_pts) = 1.0
+            zeta(num_pts) = 0.0
+            C(num_pts) = 0.0
+
+            do j=num_pts-1, 1, -1
+                C(j) = zeta(j)-mu(j)*C(j+1)
+                B(j)=(A(j+1)-A(j))/h(j) - h(j)*(C(j+1)+2.0*C(j))/3.0
+                D(j) = (C(j+1) - C(j))/(3*h(j))
+            end do
 
         end subroutine
 
@@ -185,7 +254,6 @@
             real(kind = 8) :: norm_fact
             integer, dimension(*) :: W
            
-            print *, inf%size 
             if(inf%size == 5) then
                 norm_fact = 35.000
                 W(1:inf%size) = (/-3, 12, 17, 12, -3 /)
@@ -199,6 +267,14 @@
 
         end subroutine SGinf
 
+        !returns y-value from spline function
+        real *8 function f(Ai, Bi, Ci, Di, x_val)
+        real (kind=8) :: Ai, Bi, Ci, Di, x_val
+
+        f= Ai + Bi*(x_val) + Ci*(x_val**2) + Di*(x_val**3)
+
+        return
+        end function
 
         
 

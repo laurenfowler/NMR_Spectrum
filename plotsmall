@@ -1,0 +1,6 @@
+set title "Spline on large data"
+plot [8:110] [0:80] "sample_data.dat"  with points
+replot "pts" with lines 
+set output "plot.ps"
+set terminal postscript enhanced color landscape
+replot
