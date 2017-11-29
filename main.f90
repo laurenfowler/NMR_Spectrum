@@ -24,8 +24,8 @@
             !shifts x points over so tms is at 0 on x-axis
             !shifts y points over so baseline is new 0
             do i=1, num_pts
-                !xpt(i) = xpt(i) + shift
-                !ypt(i) = ypt(i) - inf%base
+                xpt(i) = xpt(i) + shift
+                ypt(i) = ypt(i) - inf%base
             end do
 
             !filters data with user designated filter
@@ -44,18 +44,22 @@
             !***SPLINE FUNCTION WORKS***!
             call cubic_spline()
 
+            call find_roots()
+
         end program
 
-        subroutine find_root()
+        subroutine find_roots()
         use var
-        real(kind=8), dimension(100000) :: spline_pts
-        real (kind=8) :: next_x, spline_x, y_val, x_val, s, f
-        integer :: genpts
+        real (kind=8) :: next_x, spline_x, y_val, x_val, s, f, gp
+        integer :: genpts, x, s_loc, i, j
 
+
+            !generate points to begin searching for roots
             genpts = 80000
+            gp = genpts
             i=1
             j=1
-            s = (xpt(1) - xpt(num_pts))/genpts
+            s = (xpt(1) - xpt(num_pts))/gp
             next_x = xpt(j+1)
             spline_x = xpt(j)
 
@@ -68,11 +72,57 @@
                 end if
                 x_val = spline_x - xpt(j)
                 y_val=f(A(j), B(j), C(j), D(j), x_val)
+                s_xpts[i] = spline_x
+                s_ypts[i] = y_val
                 i = i + 1
                 spline_x = spline_x - s
-            end do
+            end do  
+           
+!            !x keeps track of root location array index
+!            x = 1
+
+            !s_loc keeps track of spline function for a particular root
+!            s_loc = 1
+
+            !begin searching for roots
+!            do i=1, genpts-1
+!                if(spline_xpts(i) .gt. xpts(s_loc+1) then
+!                    s_loc = s_loc + 1
+!                end if
+
+!                if((spline_ypts(i).gt.0).and.(spline_ypts(i+1).lt.0)then
+!                    roots(x)=bisection(spline_xpts(i),spline_xpts(i+1),s_loc)
+!                    s_func(x) = s_loc
+!                    x = x + 1
+!                else if((spline_ypts(i).lt.0).and.(spline_ypts(i+1).gt.0)then
+!                    roots(x)=bisection(spline_xpts(i),spline_xpts(i+1),s_loc)
+!                    s_func(x) = s_loc
+!                    x = x + 1
+!                else
+!                    continue
+!                end if
+
+!            do i=1, x
+!                call bisection(rt_loc(1), rt_loc(1)+s)                
+!            end do
 
         end subroutine 
+
+!        subroutine bisection(a,b,s_loc)
+!        use var
+!        real(kind=8) :: a, b, FA, FP, a_end, b_end
+!        integer :: i, x
+
+!        x = s_loc
+
+!        a_end = a
+!        b_end = b
+!
+!        i=1
+!        FA = f(A(x),B(x),C(x),D(x),a_end-xpt(x))
+        
+
+!        end subroutine
 
         !subroutine to read in nmr data and place in fortran struct
         subroutine nmr()

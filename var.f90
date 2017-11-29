@@ -31,4 +31,13 @@
             !variable that holds all root locations
             real(kind=8), dimension(200) :: rt_loc
 
+            !variable that holds root found by the bisection algorithm
+            real(kind=8), dimension(100) :: roots
+    
+            !variable that holds spline function for root location
+            integer, dimension(200) :: s_func
+
+            real(kind=8), dimension(100000) :: s_xpts, s_ypts
+
+
         end module

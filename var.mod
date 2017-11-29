@@ -1,5 +1,5 @@
-GFORTRAN module version '0' created from var.f90 on Sat Nov 25 00:25:12 2017
-MD5:24052268de0c01fef39dd11fdc57514b -- If you edit this, you'll get what you deserve.
+GFORTRAN module version '0' created from var.f90 on Wed Nov 29 00:07:45 2017
+MD5:7d2ebac89833b4f0e2089292c38ca349 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () () ()
 () () ())
@@ -52,19 +52,40 @@ UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN) UNKNOWN-ACCESS ())
 UNKNOWN-PROC UNKNOWN UNKNOWN) UNKNOWN-ACCESS ())) PUBLIC (() ()) () 0 0)
 17 'num_pts' 'var' 'num_pts' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN) (INTEGER 4 0 0 INTEGER ()) 0 0 () () 0 () () () 0 0)
-18 'shift' 'var' 'shift' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+18 'roots' 'var' 'roots' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (1 EXPLICIT (
+CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0
+INTEGER ()) 0 '100')) 0 () () () 0 0)
+19 'rt_loc' 'var' 'rt_loc' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (1 EXPLICIT (
+CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0
+INTEGER ()) 0 '200')) 0 () () () 0 0)
+20 's_func' 'var' 's_func' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN DIMENSION) (INTEGER 4 0 0 INTEGER ()) 0 0 () (1 EXPLICIT
+(CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0
+INTEGER ()) 0 '200')) 0 () () () 0 0)
+21 's_xpts' 'var' 's_xpts' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (1 EXPLICIT (
+CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0
+INTEGER ()) 0 '100000')) 0 () () () 0 0)
+22 's_ypts' 'var' 's_ypts' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (1 EXPLICIT (
+CONSTANT (INTEGER 4 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0
+INTEGER ()) 0 '100000')) 0 () () () 0 0)
+23 'shift' 'var' 'shift' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN) (REAL 8 0 0 REAL ()) 0 0 () () 0 () () () 0 0)
-19 'var' 'var' 'var' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+24 'var' 'var' 'var' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 UNKNOWN) (UNKNOWN 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
-20 'xpt' 'var' 'xpt' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+25 'xpt' 'var' 'xpt' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 UNKNOWN DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (1 EXPLICIT (CONSTANT (
 INTEGER 4 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 INTEGER ()) 0
 '10000')) 0 () () () 0 0)
-21 'ypt' 'var' 'ypt' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+26 'ypt' 'var' 'ypt' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 UNKNOWN DIMENSION) (REAL 8 0 0 REAL ()) 0 0 () (1 EXPLICIT (CONSTANT (
 INTEGER 4 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 INTEGER ()) 0
 '10000')) 0 () () () 0 0)
 )
 
 ('a' 0 2 'b' 0 3 'c' 0 4 'd' 0 5 'in_file' 0 6 'inf' 0 7 'nmr_info' 0 8
-'num_pts' 0 17 'shift' 0 18 'var' 0 19 'xpt' 0 20 'ypt' 0 21)
+'num_pts' 0 17 'roots' 0 18 'rt_loc' 0 19 's_func' 0 20 's_xpts' 0 21
+'s_ypts' 0 22 'shift' 0 23 'var' 0 24 'xpt' 0 25 'ypt' 0 26)
