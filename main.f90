@@ -22,11 +22,11 @@
             shift = tms()
 
             !shifts x points over so tms is at 0 on x-axis
-            !shifts y points over so baseline is new 0
             do i=1, num_pts
                 xpt(i) = xpt(i) + shift
                 ypt(i) = ypt(i) - inf%base
             end do
+
 
             !filters data with user designated filter
             !***ALL FILTERS AND INDEXES WORK PROPERLY***
@@ -44,85 +44,40 @@
             !***SPLINE FUNCTION WORKS***!
             call cubic_spline()
 
-            call find_roots()
+            call find_root()
 
         end program
 
-        subroutine find_roots()
+        !bisection algorithm
+        real *8 function bisection(aa,bb,s_loc)
         use var
-        real (kind=8) :: next_x, spline_x, y_val, x_val, s, f, gp
-        integer :: genpts, x, s_loc, i, j
+        real(kind=8) :: aa, bb, FA, FP, a_end, b_end, f, p
+        integer :: i, x, s_loc
+  
+        x = s_loc
+        a_end = aa
+        b_end = bb
 
-
-            !generate points to begin searching for roots
-            genpts = 80000
-            gp = genpts
-            i=1
-            j=1
-            s = (xpt(1) - xpt(num_pts))/gp
-            next_x = xpt(j+1)
-            spline_x = xpt(j)
-
-            do while(i<genpts+1)
-                ! if step size has put x at another point, change the
-                ! spline function being called
-                if(spline_x .lt. next_x) then
-                    j = j + 1
-                    next_x = xpt(j+1)
+        i=1
+        FA = f(A(x),B(x),C(x),D(x),a_end-xpt(x))        
+        do while(i<5000)
+            p = a_end + (b_end-a_end)/2.0
+            FP=f(A(x),B(x),C(x),D(x),p-xpt(x))
+            if((FP==0.0) .or. ((b_end-a_end)/2.0 .le. inf%tol)) then
+                bisection = p
+                exit
+            else
+                i=i+1
+                if((FA*FP) .gt. 0) then
+                    a_end = p
+                    FA = FP
+                else
+                    b_end = p
                 end if
-                x_val = spline_x - xpt(j)
-                y_val=f(A(j), B(j), C(j), D(j), x_val)
-                s_xpts[i] = spline_x
-                s_ypts[i] = y_val
-                i = i + 1
-                spline_x = spline_x - s
-            end do  
-           
-!            !x keeps track of root location array index
-!            x = 1
-
-            !s_loc keeps track of spline function for a particular root
-!            s_loc = 1
-
-            !begin searching for roots
-!            do i=1, genpts-1
-!                if(spline_xpts(i) .gt. xpts(s_loc+1) then
-!                    s_loc = s_loc + 1
-!                end if
-
-!                if((spline_ypts(i).gt.0).and.(spline_ypts(i+1).lt.0)then
-!                    roots(x)=bisection(spline_xpts(i),spline_xpts(i+1),s_loc)
-!                    s_func(x) = s_loc
-!                    x = x + 1
-!                else if((spline_ypts(i).lt.0).and.(spline_ypts(i+1).gt.0)then
-!                    roots(x)=bisection(spline_xpts(i),spline_xpts(i+1),s_loc)
-!                    s_func(x) = s_loc
-!                    x = x + 1
-!                else
-!                    continue
-!                end if
-
-!            do i=1, x
-!                call bisection(rt_loc(1), rt_loc(1)+s)                
-!            end do
-
-        end subroutine 
-
-!        subroutine bisection(a,b,s_loc)
-!        use var
-!        real(kind=8) :: a, b, FA, FP, a_end, b_end
-!        integer :: i, x
-
-!        x = s_loc
-
-!        a_end = a
-!        b_end = b
-!
-!        i=1
-!        FA = f(A(x),B(x),C(x),D(x),a_end-xpt(x))
-        
-
-!        end subroutine
+            end if
+        end do
+        return 
+        end function
 
         !subroutine to read in nmr data and place in fortran struct
         subroutine nmr()
@@ -298,7 +253,67 @@
 
         end subroutine
 
-        !assignes correct normalization factor and  populates W array
+        subroutine find_root()
+        use var
+        real (kind=8) :: next_x, spline_x, y_val, x_val, s, gp, f
+        real (kind=8) :: bisection
+        integer :: genpts, x, s_loc, i, j, next_loc
+
+            !generate points to begin searching for roots
+            genpts = 80000
+            gp = genpts
+            i=1
+            j=1
+            s = (xpt(1) - xpt(num_pts))/gp
+            next_x = xpt(j+1)
+            spline_x = xpt(j)
+
+            do while(i<genpts+1)
+                ! if step size has put x at another point, change the
+                ! spline function being called
+                if(spline_x .lt. next_x) then
+                    j = j + 1
+                    next_x = xpt(j+1)
+                end if
+                x_val = spline_x - xpt(j)
+                y_val=f(A(j), B(j), C(j), D(j), x_val)
+                
+                !assign interpolated values to array
+                s_xpts(i) = spline_x
+                s_ypts(i) = y_val
+                i = i + 1
+                spline_x = spline_x - s
+            end do
+
+            s_loc = 1
+            next_loc = 2
+            x = 1
+
+            !begin searching for roots
+            do i=1, genpts-1
+                if(s_xpts(i) .lt. xpt(next_loc)) then
+                    s_loc = s_loc + 1
+                    next_loc = next_loc + 1
+                end if
+
+                if((s_ypts(i).gt.0).and.(s_ypts(i+1).lt.0))then
+                    roots(x)=bisection(s_xpts(i),s_xpts(i+1),s_loc)
+                    s_func(x) = s_loc
+                    x = x + 1
+                else if((s_ypts(i).lt.0).and.(s_ypts(i+1).gt.0))then
+                    roots(x)=bisection(s_xpts(i),s_xpts(i+1),s_loc)
+                    s_func(x) = s_loc
+                    x = x + 1
+                else
+                    continue
+                end if
+            end do
+
+        end subroutine
+
+
+
+       !assignes correct normalization factor and  populates W array
         subroutine SGinf(norm_fact, W)
         use var
             real(kind = 8) :: norm_fact

@@ -1,0 +1,3 @@
+set title "Spline on large data"
+plot [-16:8] [-50000:20000] "shifted"  with points
+replot "crazy" with points
