@@ -46,6 +46,8 @@
 
             call find_root()
 
+            call Fourier_Transform()
+
         end program
 
         !bisection algorithm
@@ -214,6 +216,30 @@
 
         end subroutine
 
+        subroutine Fourier_Transform()
+        use var
+        complex *16, dimension(10000) :: y
+        complex *16, dimension(10000,10000) :: cc, z
+        complex *16  :: i, cmpx
+        integer :: j, k
+        real(kind=8) :: tmp
+
+            i = -1.0**(1.0/2.0)
+            y = ypt
+            cmpx = -i * 2.0 * acos(-1.0) 
+            cmpx = cmpx/num_pts
+
+            !solve for z matrix
+            do j=1, num_pts
+                do k=1, num_pts
+                    tmp = j*k
+                    z(j,k) = ((exp(cmpx))**tmp)/(num_pts**(1.0/2.0))
+                    print *, z(j,k)
+                end do
+            end do
+
+        end subroutine
+
         subroutine cubic_spline()
         use var
         real(kind=8), dimension(10000) :: alpha, iota, mu, zeta, h
@@ -308,6 +334,8 @@
                     continue
                 end if
             end do
+    
+            num_rts = x-1
 
         end subroutine
 
@@ -331,6 +359,20 @@
             end if
 
         end subroutine SGinf
+
+        subroutine trapezoid()
+        use var
+        real(kind=8) :: h
+        integer :: curr_spline
+
+        do i=num_rts, 4, -2
+            h = (roots(i)-roots(i-2))/10
+            !condition to catch second root 
+            
+        end do
+
+ 
+        end subroutine
 
         !returns y-value from spline function
         real *8 function f(Ai, Bi, Ci, Di, x_val)
