@@ -40,5 +40,8 @@
             !holds generated spline points
             real(kind=8), dimension(100000) :: s_xpts, s_ypts
 
+            real(kind=8), parameter :: pi =  3.1415926535897932
+    
+
 
         end module
