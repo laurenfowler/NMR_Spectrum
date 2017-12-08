@@ -46,7 +46,9 @@
 
             call find_root()
 
-            call Fourier_Transform()
+            !call Fourier_Transform()
+
+            call trapezoid()
 
         end program
 
@@ -242,10 +244,10 @@
             end do
 
             !assign z to cc 
-            cc = z
+           ! cc = z
 
             !use linear solver to calcuate c matrix
-            call ZGESV(N, 1, cc, 1, IPIV, y, LDB, INFO)
+            !call ZGESV(N, 1, cc, 1, IPIV, y, LDB, INFO)
             !print *, INFO  
 
         end subroutine
@@ -372,16 +374,49 @@
 
         subroutine trapezoid()
         use var
-        real(kind=8) :: h
-        integer :: curr_spline
+        real(kind=8) :: h, next_pt, from_pt, area, fa, fb, f
+        real(kind=8) :: spline_x
+        integer :: c_spl, indx
 
+        
         do i=num_rts, 4, -2
-            h = (roots(i)-roots(i-2))/10
-            !condition to catch second root 
+            !stop condition for integration
+            stop_x = roots(i-1)
+
+            !inital do loop conditions
+            !starts at first root location
+            from_pt = roots(i)
             
+            !first spline function
+            c_spl = s_func(i)             
+
+            !ends at next xpt from root location
+            to_pt = xpt(c_spl-1)
+
+            !step size
+            h = abs(from_pt-to_pt)
+
+            !spline x
+            spline_x = xpt(c_spl)
+
+            !Areas are negative?
+            area = 0
+            
+            do while(to_pt .lt. stop_x)
+                fa = f(A(c_spl),B(c_spl),C(c_spl),D(c_spl), spline_x-from_pt) 
+                fb = f(A(c_spl),B(c_spl),C(c_spl),D(c_spl), spline_x-to_pt)
+
+                area = area + ((fa+fb) * (h/2.0))
+
+                c_spl = c_spl - 1
+                from_pt = to_pt
+                to_pt = xpt(c_spl-1)
+                h = abs(from_pt-to_pt)
+                spline_x = xpt(c_spl)
+            end do
+            print *, area
         end do
 
- 
         end subroutine
 
         !returns y-value from spline function

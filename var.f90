@@ -42,6 +42,8 @@
 
             real(kind=8), parameter :: pi =  3.1415926535897932
     
+            !holds integrated areas from desingated integration method
+            real(kind=8), dimension(200) :: area
 
 
         end module
