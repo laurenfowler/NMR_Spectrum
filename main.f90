@@ -218,16 +218,17 @@
 
         subroutine Fourier_Transform()
         use var
-        complex (kind=8), dimension(10000) :: y
-        complex (kind=8), dimension(10000,10000) :: cc, z, g
-        complex (kind=8) :: cnum, cmpx
+        complex *16, dimension(10000) :: y
+        complex *16, dimension(10000,10000) :: cc, z, g
+        complex *16 :: cnum, cmpx
         integer, dimension(10000) :: IPIV
         integer :: j, k, LDA, INFO, N
         real(kind=8) :: tmp
 
 
             N = num_pts
-            LDA = num_pts
+
+            LDB = num_pts
             cnum = cmplx(cos((2.0*pi)/num_pts), -sin((2.0*pi)/num_pts))
             y = ypt
             cmpx = cnum/num_pts
@@ -240,9 +241,12 @@
                 end do
             end do
 
-            !use linear solver to calcuate c matric
-            call ZGESV(N, N, z, LDA, IPIV, cc, INFO)
-            print *, INFO  
+            !assign z to cc 
+            cc = z
+
+            !use linear solver to calcuate c matrix
+            call ZGESV(N, 1, cc, 1, IPIV, y, LDB, INFO)
+            !print *, INFO  
 
         end subroutine
 
