@@ -46,10 +46,13 @@
 
             call find_root()
 
-            call Fourier_Transform()
+            !call Fourier_Transform()
 
             !Trapezoid method works
             call trapezoid()
+
+            !Crazy numbers..
+            !call romberg()
 
         end program
 
@@ -245,10 +248,10 @@
             end do
 
             !assign z to cc 
-            cc = z
+            !cc = z
 
             !use linear solver to calcuate c matrix
-            call ZGESV(N, 1, cc, 1, IPIV, y, LDB, INFO)
+            !call ZGESV(N, 1, cc, 1, IPIV, y, LDB, INFO)
             !print *, INFO  
 
         end subroutine
@@ -402,7 +405,6 @@
             !spline x
             spline_x = xpt(c_spl)
 
-            !Areas are negative?
             curr_area = 0
             
             do while(to_pt .lt. stop_x)
@@ -427,11 +429,110 @@
 
         end subroutine
 
+        subroutine romberg()
+        use var
+        real (kind=8) :: f, from_pt, to_pt, fa, fb
+        real(kind=8) :: spline_x, summat, sum_val
+        real(kind=8), allocatable :: R(:,:)
+        integer :: c_spl, indx, n, e
+    
+        !index for area matrix
+        indx = 1
+        n=5
+        allocate(R(1:5,1:5))
+
+        do i=num_rts, 21, -2
+            !stop condition for integration
+            stop_x = roots(i-1)
+
+            !inital do loop conditions
+            !starts at first root location
+            from_pt = roots(i)
+            
+            !first spline function
+            c_spl = s_func(i)             
+
+            !ends at next xpt from root location
+            to_pt = xpt(c_spl-1)
+
+            !spline x
+            spline_x = xpt(c_spl)
+            
+            !step size
+            h = abs(from_pt-to_pt)
+
+            do while(to_pt .lt. stop_x)
+                print *, "points", from_pt, to_pt
+                print *, " "
+
+                fa = f(A(c_spl), B(c_spl), C(c_spl),D(c_spl),spline_x-from_pt)
+                fb = f(A(c_spl), B(c_spl), C(c_spl),D(c_spl),spline_x-to_pt)
+
+                R(1,1) = (h/2.0) * (fa + fb)
+                curr_area = R(1,1)
+                print *, R(1,1)
+
+                do j=2, n
+                    sum_val = summat(j,h,from_pt, c_spl)
+                    R(j,1)=(1.0/2.0)*(R(j-1,1)+(h*sum_val))
+                    do e=2, j
+                        R(j,e)=R(j,e-1)+((R(j,e-1)-R(j-1,e-1))/((4**(e-1))-1))
+                    end do
+                print*, R(j, 1:j)
+                h = h/2.0
+                curr_area = R(j,e)
+                
+
+                !print *, "R(j-1,j-1)", R(j-1,j-1)
+                !print *, "R(j,j)", R(j,j)
+                !print *, abs(R(j-1,j-1)-R(j,j))
+
+                if(abs(R(j-1,j-1)-R(j,j)) < inf%tol)then
+                    print *, "exit condition"
+                    exit
+                end if
+
+                end do
+
+                c_spl = c_spl - 1
+                from_pt = to_pt
+                to_pt = xpt(c_spl-1)
+                h = abs(from_pt-to_pt)
+                spline_x = xpt(c_spl)
+
+                print *, " "
+            end do
+            area(indx) = curr_area
+            indx = indx + 1
+        end do        
+
+        end subroutine
+
         !returns y-value from spline function
         real *8 function f(Ai, Bi, Ci, Di, x_val)
         real (kind=8) :: Ai, Bi, Ci, Di, x_val
 
         f= Ai + Bi*(x_val) + Ci*(x_val**2) + Di*(x_val**3)
+
+        return
+        end function
+
+        !for rhomberg
+        real *8 function summat(j, h, aa, c_spl)
+        use var
+        real(kind=8) :: sum, h, aa, fa
+        integer :: upper_index, c_spl, j
+
+        upper_index = 2 * (j-2)
+        sum = 0
+
+        do k=1, upper_index
+            ak = aa + ((k - 0.5)*h)
+            fa = f(A(c_spl),B(c_spl),C(c_spl),D(c_spl),xpt(c_spl)-ak)
+            sum = sum + fa
+        end do
+
+        summat = sum
 
         return
         end function
