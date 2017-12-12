@@ -46,8 +46,9 @@
 
             call find_root()
 
-            !call Fourier_Transform()
+            call Fourier_Transform()
 
+            !Trapezoid method works
             call trapezoid()
 
         end program
@@ -244,10 +245,10 @@
             end do
 
             !assign z to cc 
-           ! cc = z
+            cc = z
 
             !use linear solver to calcuate c matrix
-            !call ZGESV(N, 1, cc, 1, IPIV, y, LDB, INFO)
+            call ZGESV(N, 1, cc, 1, IPIV, y, LDB, INFO)
             !print *, INFO  
 
         end subroutine
@@ -374,10 +375,12 @@
 
         subroutine trapezoid()
         use var
-        real(kind=8) :: h, next_pt, from_pt, area, fa, fb, f
+        real(kind=8) :: h, next_pt, from_pt, curr_area, fa, fb, f
         real(kind=8) :: spline_x
         integer :: c_spl, indx
 
+        !index for area matrix
+        indx = 1
         
         do i=num_rts, 4, -2
             !stop condition for integration
@@ -400,13 +403,13 @@
             spline_x = xpt(c_spl)
 
             !Areas are negative?
-            area = 0
+            curr_area = 0
             
             do while(to_pt .lt. stop_x)
                 fa = f(A(c_spl),B(c_spl),C(c_spl),D(c_spl), spline_x-from_pt) 
                 fb = f(A(c_spl),B(c_spl),C(c_spl),D(c_spl), spline_x-to_pt)
 
-                area = area + ((fa+fb) * (h/2.0))
+                curr_area = curr_area + ((fa+fb) * (h/2.0))
 
                 c_spl = c_spl - 1
                 from_pt = to_pt
@@ -414,7 +417,12 @@
                 h = abs(from_pt-to_pt)
                 spline_x = xpt(c_spl)
             end do
-            print *, area
+            area(indx) = curr_area
+            indx = indx + 1
+        end do
+
+        do i=1, indx-1
+            print *, area(i)
         end do
 
         end subroutine
